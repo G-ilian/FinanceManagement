@@ -1,8 +1,11 @@
 ﻿
 
 using Finance_console;
+using FinanceManagement.Shared.Data.DB;
+using System.Threading.Channels;
 
-Dictionary<string, Conta> contasDict = new Dictionary<string, Conta>();
+
+var contaDAL = new ContaDAL(new FinanceContext());
 
 bool sair = false;
 
@@ -12,7 +15,8 @@ while (!sair)
     Console.WriteLine("1 - Adicionar conta");
     Console.WriteLine("2 - Adicionar transação");
     Console.WriteLine("3 - Listar transações");
-    Console.WriteLine("4 - Sair\n");
+    Console.WriteLine("4 - Cadastrar Investimento");
+    Console.WriteLine("5 - Sair\n");
     Console.WriteLine("Informe sua escolha: ");
     int opcao = int.Parse(Console.ReadLine());
 
@@ -28,6 +32,9 @@ while (!sair)
             ListarTransacoes();
             break;
         case 4:
+            CadastrarInvestimento();
+            break;
+        case 5:
             Console.WriteLine("Obrigado por utilizar!");
             sair = true;
             break;
@@ -42,9 +49,56 @@ while (!sair)
 
 }
 
+void CadastrarInvestimento()
+{
+    Console.Clear();
+    Console.WriteLine("Registro de investimentos /n");
+    if (contaDAL.Read().Equals(null))
+    {
+        Console.WriteLine("Nenhuma conta registrada");
+        return;
+    }
+    else
+    {
+        ListarContas();
+        Console.WriteLine("/n");
+        Console.WriteLine("Informe o nome da conta: ");
+        String nome = Console.ReadLine();
+        
+        if (ContaExiste(nome))
+        {
+            Console.WriteLine("Informe a descrição do investimento: ");
+            String descricao = Console.ReadLine();
+            Console.WriteLine("Informe o valor investido: ");
+            double valorInvestido = double.Parse(Console.ReadLine());
+            Console.WriteLine("Informe o tipo do investimento: ");
+            String tipoInvestimento = Console.ReadLine();
+            Console.WriteLine("Informe a corretora: ");
+            String corretora = Console.ReadLine();
+            Console.WriteLine("Informe o risco do investimento: ");
+            String riscoInvestimento = Console.ReadLine();
+            Console.WriteLine("Informe a rentabilidade: ");
+            double rentabilidade = double.Parse(Console.ReadLine());
+        }
+        else
+        {
+            Console.WriteLine("Conta não encontrada");
+        }
+
+    }
+}
+
+void ListarContas()
+{
+    foreach (var conta in contaDAL.Read())
+    {
+        conta.ToString();
+    }
+}
+
 void ListarTransacoes()
 {
-    if(contasDict.Count == 0)
+    if(contaDAL.Read().Equals(null))
     {
         Console.WriteLine("Nenhuma conta registrada");
         return;
@@ -52,7 +106,7 @@ void ListarTransacoes()
     else
     {   
         Console.WriteLine("Listando transações da conta");
-        foreach (var conta in contasDict.Values)
+        foreach (var conta in contaDAL.Read())
         {
             conta.listarTransacoes();
         }
@@ -65,12 +119,10 @@ void RegistrarTransacao()
     Console.Clear();
     Console.WriteLine("Registro de transações /n");
 
-    Random random = new Random();
-    int idTransacao = random.Next(1000, 10000); // Gera um número entre 1000 e 9999
     Console.WriteLine("Informe o nome da conta: ");
     String nome = Console.ReadLine();
 
-    if (contasDict.ContainsKey(nome))
+    if (ContaExiste(nome))
     {
         Console.WriteLine("Informe o valor da transação: ");
         double valor = double.Parse(Console.ReadLine());
@@ -81,8 +133,10 @@ void RegistrarTransacao()
         Console.WriteLine("Informe o tipo da transação: ");
         String tipo = Console.ReadLine();
 
-        Transacao transacao = new Transacao(idTransacao, valor, dataTransacao, descricao, tipo);
-        contasDict[nome].adicionarTransacao(transacao);
+        Transacao transacao = new Transacao(valor, dataTransacao, descricao, tipo);
+
+        TransacaoDAL transacaoDAL = new TransacaoDAL(new FinanceContext());
+        transacaoDAL.Create(transacao);
     }
     else
     {
@@ -103,8 +157,14 @@ void RegistrarConta()
     Console.WriteLine("Informe a instituição financeira: ");
     String instituicaoFinanceira = Console.ReadLine();
 
-    Conta conta = new Conta(contasDict.Count + 1, nome, tipo, saldo, instituicaoFinanceira);
-    contasDict.Add(nome, conta);
+    Conta conta = new Conta(nome, tipo, saldo, instituicaoFinanceira);
+    contaDAL.Create(conta);
 
     Console.WriteLine("Conta registrada com sucesso!");
+}
+
+bool ContaExiste(String nome)
+{
+    Console.WriteLine("Buscando a conta....");
+    return contaDAL.ReadyByName(nome) != null;
 }

@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 
 namespace Finance_console
 {
-    internal class Conta
+    public class Conta
     {
         public int id { get; set; }
         public string nome { get; set; }
         public string tipo { get; set; }
         public double saldo { get; set; }
-        public string instituicaoFinanceira { get; set; }
+        public string instituicao { get; set; }
 
         public List<Transacao> transacaoes = new List<Transacao>();
 
-        public Conta(int id, string nome, string tipo, double saldo, string instituicaoFinanceira)
+        public Conta(string nome, string tipo, double saldo, string instituicao)
         {
-            this.id = id;
             this.nome = nome;
             this.tipo = tipo;
             this.saldo = saldo;
-            this.instituicaoFinanceira = instituicaoFinanceira;
+            this.instituicao = instituicao;
         }
 
         public void adicionarTransacao(Transacao transacao)
@@ -40,7 +39,12 @@ namespace Finance_console
         }
         public override string ToString()
         {
-            return $@"Conta: {this.id}, {this.nome}, {this.tipo}, {this.saldo}, {this.instituicaoFinanceira}";
+            return $@"DADOS DA CONTA 
+                    ID: {this.id}, 
+                    Nome: {this.nome}, 
+                    Tipo: {this.tipo}, 
+                    Saldo: {this.saldo},
+                    Instituicão: {this.instituicao}";
         }
     }
 }

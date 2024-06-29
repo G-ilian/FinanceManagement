@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Finance_console
 {
-    internal class Transacao
+    public class Transacao
     {
         public int id { get; set; }
         public double valor { get; set; }
@@ -14,9 +14,8 @@ namespace Finance_console
         public string descricao { get; set; }
         public string tipo { get; set; }
 
-        public Transacao(int id, double valor, DateTime dataTransacao, string descricao, string tipo)
+        public Transacao(double valor, DateTime dataTransacao, string descricao, string tipo)
         {
-            this.id = id;
             this.valor = valor;
             this.dataTransacao = dataTransacao;
             this.descricao = descricao;
