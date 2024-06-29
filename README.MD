@@ -8,7 +8,7 @@
 
 
     #### Projeto
-    - As ferramentas para a construção do web service foram a linguagem C#, junto ao framework .NET Core.
+    - As ferramentas para a construção do web service foram a linguagem C#, junto ao framework .NET Core..
 
 
     ### :computer: Funcionalidades dos Projetos
