@@ -13,8 +13,7 @@ namespace Finance_console
         public string tipo { get; set; }
         public double saldo { get; set; }
         public string instituicao { get; set; }
-
-        public List<Transacao> transacaoes = new List<Transacao>();
+        public virtual ICollection<Transacao> transacaoes { get; set; } = new List<Transacao>();
 
         public Conta(string nome, string tipo, double saldo, string instituicao)
         {
@@ -26,7 +25,7 @@ namespace Finance_console
 
         public void adicionarTransacao(Transacao transacao)
         {
-            this.transacaoes.Add(transacao);
+            this.transacaoes.Append(transacao);
         }
 
         public void listarTransacoes()

@@ -14,11 +14,13 @@ namespace FinanceManagement.Shared.Data.DB
         public DbSet<Conta> Conta { get; set; }
         public DbSet<Transacao> Transacao { get; set; }
 
-        private string _connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=FinanceDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
+        private string _connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=FinanceDB_V0;" +
+            "Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;" +
+            "Multi Subnet Failover=False";
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseSqlServer(_connectionString).UseLazyLoadingProxies();
         }
     }
 }

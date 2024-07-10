@@ -13,6 +13,7 @@ namespace Finance_console
         public DateTime dataTransacao { get; set; }
         public string descricao { get; set; }
         public string tipo { get; set; }
+        public virtual Conta? conta{ get; set; }
 
         public Transacao(double valor, DateTime dataTransacao, string descricao, string tipo)
         {

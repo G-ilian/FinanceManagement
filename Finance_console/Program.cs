@@ -2,7 +2,6 @@
 
 using Finance_console;
 using FinanceManagement.Shared.Data.DB;
-using System.Threading.Channels;
 
 
 var contaDAL = new DAL<Conta>(new FinanceContext());
@@ -65,25 +64,7 @@ void CadastrarInvestimento()
         Console.WriteLine("Informe o nome da conta: ");
         String nome = Console.ReadLine();
         
-        if (ContaExiste(nome))
-        {
-            Console.WriteLine("Informe a descrição do investimento: ");
-            String descricao = Console.ReadLine();
-            Console.WriteLine("Informe o valor investido: ");
-            double valorInvestido = double.Parse(Console.ReadLine());
-            Console.WriteLine("Informe o tipo do investimento: ");
-            String tipoInvestimento = Console.ReadLine();
-            Console.WriteLine("Informe a corretora: ");
-            String corretora = Console.ReadLine();
-            Console.WriteLine("Informe o risco do investimento: ");
-            String riscoInvestimento = Console.ReadLine();
-            Console.WriteLine("Informe a rentabilidade: ");
-            double rentabilidade = double.Parse(Console.ReadLine());
-        }
-        else
-        {
-            Console.WriteLine("Conta não encontrada");
-        }
+
 
     }
 }
@@ -121,8 +102,9 @@ void RegistrarTransacao()
 
     Console.WriteLine("Informe o nome da conta: ");
     String nome = Console.ReadLine();
+    var conta = contaExiste(nome);
 
-    if (ContaExiste(nome))
+    if (conta is not null)
     {
         Console.WriteLine("Informe o valor da transação: ");
         double valor = double.Parse(Console.ReadLine());
@@ -133,10 +115,11 @@ void RegistrarTransacao()
         Console.WriteLine("Informe o tipo da transação: ");
         String tipo = Console.ReadLine();
 
+        
         Transacao transacao = new Transacao(valor, dataTransacao, descricao, tipo);
+        conta.adicionarTransacao(transacao);
 
-        var transacaoDAL = new DAL<Transacao>(new FinanceContext());
-        transacaoDAL.Create(transacao);
+        contaDAL.Update(conta);
     }
     else
     {
@@ -163,8 +146,7 @@ void RegistrarConta()
     Console.WriteLine("Conta registrada com sucesso!");
 }
 
-bool ContaExiste(String nome)
+Conta contaExiste(String nome)
 {
-    Console.WriteLine("Buscando a conta....");
-    return contaDAL.ReadBy(Conta => Conta.nome.Equals(nome)) != null;
+    return contaDAL.ReadBy(conta => conta.nome.Equals(nome));
 }
