@@ -5,7 +5,7 @@ using FinanceManagement.Shared.Data.DB;
 using System.Threading.Channels;
 
 
-var contaDAL = new ContaDAL(new FinanceContext());
+var contaDAL = new DAL<Conta>(new FinanceContext());
 
 bool sair = false;
 
@@ -135,7 +135,7 @@ void RegistrarTransacao()
 
         Transacao transacao = new Transacao(valor, dataTransacao, descricao, tipo);
 
-        TransacaoDAL transacaoDAL = new TransacaoDAL(new FinanceContext());
+        var transacaoDAL = new DAL<Transacao>(new FinanceContext());
         transacaoDAL.Create(transacao);
     }
     else
@@ -166,5 +166,5 @@ void RegistrarConta()
 bool ContaExiste(String nome)
 {
     Console.WriteLine("Buscando a conta....");
-    return contaDAL.ReadyByName(nome) != null;
+    return contaDAL.ReadBy(Conta => Conta.nome.Equals(nome)) != null;
 }

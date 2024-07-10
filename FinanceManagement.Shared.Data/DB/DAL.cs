@@ -1,6 +1,4 @@
-﻿using Finance_console;
-using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,81 +6,73 @@ using System.Threading.Tasks;
 
 namespace FinanceManagement.Shared.Data.DB
 {
-    public class ContaDAL
+    public class DAL<T> where T : class
     {
         private readonly FinanceContext context;
 
-        public ContaDAL(FinanceContext context)
+        public DAL(FinanceContext context)
         {
             this.context = context;
         }
 
-        public IEnumerable<Conta> Read()
+        public void Create(T entity)
         {
-
-            var list = new List<Conta>();
-
             try
             {
-                list = context.Conta.ToList();
+                context.Set<T>().Add(entity);
+                context.SaveChanges();
             }
             catch (Exception error)
             {
+                Console.WriteLine(error.Message);
+            }
+        }
 
+        public IEnumerable<T> Read() 
+        {
+            var list = new List<T>();
+
+            try
+            {
+                list = context.Set<T>().ToList();
+            }
+            catch (Exception error)
+            {
                 Console.WriteLine(error.Message);
             }
 
             return list;
         }
 
-        public void Create(Conta conta)
+        public void Update(T entity)
         {
             try
             {
-                context.Conta.Add(conta);
+                context.Set<T>().Update(entity);
                 context.SaveChanges();
             }
             catch (Exception error)
             {
-
                 Console.WriteLine(error.Message);
             }
         }
 
-        public void Update(Conta conta)
+        public void Delete(T entity)
         {
             try
             {
-                context.Update(conta);
+                context.Set<T>().Remove(entity);
                 context.SaveChanges();
             }
             catch (Exception error)
             {
-
                 Console.WriteLine(error.Message);
             }
         }
 
-        public void Delete(Conta conta)
+        public T? ReadBy(Func<T,bool> predicate)
         {
-            try
-            {
-                context.Remove(conta);
-                context.SaveChanges();
-            }
-            catch (Exception error)
-            {
-
-                Console.WriteLine(error.Message);
-            }
+            return context.Set<T>().FirstOrDefault(predicate);
         }
-
-        public Conta? ReadyByName(String nome){
-            return context.Conta.FirstOrDefault(c => c.nome == nome);
-        }
-
-
     }
-
-
 }
