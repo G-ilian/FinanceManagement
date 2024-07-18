@@ -1,4 +1,6 @@
-﻿using Finance_console;
+﻿using Finance.Requests;
+using Finance.Responses;
+using Finance_console;
 using FinanceManagement.Shared.Data.DB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,29 +13,30 @@ namespace Finance.Endpoints
 
             app.MapGet("/Transacao", ([FromServices] DAL<Transacao> dal) =>
             {
-                return Results.Ok(dal.Read());
+                return Results.Ok(EntityListToResponse(dal.Read()));
             });
 
             app.MapPost("/Transacao", ([FromServices] DAL<Transacao> dal
-                , [FromBody] Transacao transacao) => {
-
+                , [FromBody] TransacaoRequest transacaoRequest) => {
+                    var transacao = new Transacao(transacaoRequest.valor, transacaoRequest.dataTransacao, 
+                         transacaoRequest.descricao, transacaoRequest.tipo);
                     dal.Create(transacao);
                     return Results.Ok();
                 });
 
-            app.MapPut("/Transacao", ([FromServices] DAL<Transacao> dal, [FromBody] Transacao transacao) => {
-                var transacaoToEdit = dal.ReadBy(t => t.id == transacao.id);
+            app.MapPut("/Transacao", ([FromServices] DAL<Transacao> dal, 
+                [FromBody] TransacaoEditRequest transacaoEditRequest) => {
+                var transacaoToEdit = dal.ReadBy(t => t.id == transacaoEditRequest.id);
 
                 if (transacaoToEdit is null)
                     return Results.NotFound();
 
-                transacaoToEdit.valor = transacao.valor;
-                transacaoToEdit.dataTransacao = transacao.dataTransacao;
-                transacaoToEdit.descricao = transacao.descricao;
-                transacaoToEdit.tipo = transacao.tipo;
+                transacaoToEdit.valor = transacaoEditRequest.valor;
+                transacaoToEdit.dataTransacao = transacaoEditRequest.dataTransacao;
+                transacaoToEdit.descricao = transacaoEditRequest.descricao;
+                transacaoToEdit.tipo = transacaoEditRequest.tipo;
 
-
-                dal.Update(transacao);
+                dal.Update(transacaoToEdit);
                 return Results.Ok();
             });
 
@@ -47,6 +50,16 @@ namespace Finance.Endpoints
                 dal.Delete(transacao);
                 return Results.Ok();
             });
+        }
+
+        private static ICollection<TransacaoResponse> EntityListToResponse(IEnumerable<Transacao> transacaoList)
+        {
+            return transacaoList.Select(t => EntityToResponse(t)).ToList();
+        }
+
+        private static TransacaoResponse EntityToResponse(Transacao transacao)
+        {
+            return new TransacaoResponse(transacao.valor, transacao.dataTransacao, transacao.descricao, transacao.tipo, transacao.id);
         }
     }
 }

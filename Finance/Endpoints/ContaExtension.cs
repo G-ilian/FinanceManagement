@@ -1,4 +1,6 @@
-﻿using Finance_console;
+﻿using Finance.Requests;
+using Finance.Responses;
+using Finance_console;
 using FinanceManagement.Shared.Data.DB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,28 +12,40 @@ namespace Finance.Endpoints
         {
             app.MapGet("/Contas", ([FromServices] DAL<Conta> dal) =>
             {
-                return Results.Ok(dal.Read());
+
+                return Results.Ok(EntityListToResponse(dal.Read()));
+            });
+
+            app.MapGet("/Contas/{id}", ([FromServices] DAL<Conta> dal,int id) =>
+            {
+                var hero = dal.ReadBy(dal => dal.id == id);
+                if (hero is null)
+                    return Results.NotFound();
+                return Results.Ok(EntityToResponse(hero));
             });
 
             app.MapPost("/Contas", ([FromServices] DAL<Conta> dal,
-                [FromBody] Conta conta) =>
+                [FromBody] ContaRequest contaRequest) =>
             {
+                var conta = new Conta(contaRequest.nome, contaRequest.tipo, 
+                    contaRequest.saldo, contaRequest.instituicao);
+
                 dal.Create(conta);
                 return Results.Ok();
             });
 
             app.MapPut("/Contas", ([FromServices] DAL<Conta> dal,
-                [FromBody] Conta conta) =>
+                [FromBody] ContaEditRequest contaEditRequest) =>
             {
-                var contaToEdit = dal.ReadBy(c => c.id == conta.id);
+                var contaToEdit = dal.ReadBy(c => c.id == contaEditRequest.id);
 
                 if (contaToEdit is null)
                     return Results.NotFound();
 
-                contaToEdit.nome = conta.nome;
-                contaToEdit.saldo = conta.saldo;
-                contaToEdit.tipo = conta.tipo;
-                contaToEdit.instituicao = conta.instituicao;
+                contaToEdit.nome = contaEditRequest.nome;
+                contaToEdit.saldo = contaEditRequest.saldo;
+                contaToEdit.tipo = contaEditRequest.tipo;
+                contaToEdit.instituicao = contaEditRequest.instituicao;
 
                 dal.Update(contaToEdit);
 
@@ -49,6 +63,16 @@ namespace Finance.Endpoints
                 dal.Delete(conta);
                 return Results.Ok();
             });
+        }
+
+        private static ICollection<ContaResponse> EntityListToResponse(IEnumerable<Conta> contaList)
+        {
+            return contaList.Select(c => EntityToResponse(c)).ToList();
+        }
+
+        private static ContaResponse EntityToResponse(Conta conta)
+        {
+            return new ContaResponse(conta.nome, conta.tipo, conta.saldo, conta.instituicao, conta.id);
         }
     }
 }
