@@ -13,6 +13,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 builder.Services.AddDbContext<FinanceContext>();
 builder.Services.AddTransient<DAL<Conta>>();
 builder.Services.AddTransient<DAL<Transacao>>();
+builder.Services.AddTransient<DAL<Investimentos>>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -22,6 +23,7 @@ var app = builder.Build();
 
 app.AddEndpointsConta();
 app.AddEndpointsTransacao();
+app.AddEndpointsInvestimento();
 
 // Swagger UI
 app.UseSwagger();

@@ -25,6 +25,7 @@ namespace Finance.Endpoints
             });
 
             app.MapPost("/Contas", ([FromServices] DAL<Conta> dal,
+                [FromServices] DAL<Investimentos> dalInv,
                 [FromBody] ContaRequest contaRequest) =>
             {   
                 var conta = new Conta(contaRequest.nome, contaRequest.tipo, 
@@ -32,7 +33,7 @@ namespace Finance.Endpoints
 
                             investimentos = 
                             contaRequest.investimentos is not null ?
-                            investimentoRequestConverter(contaRequest.investimentos) : 
+                            investimentoRequestConverter(contaRequest.investimentos,dalInv) : 
                             new List<Investimentos>()
                     
                     };
@@ -73,9 +74,27 @@ namespace Finance.Endpoints
             });
         }
 
-        private static ICollection<Investimentos> investimentoRequestConverter(ICollection<InvestimentoRequest> investimentos)
+        private static ICollection<Investimentos> investimentoRequestConverter(
+            ICollection<InvestimentoRequest> investimentos,
+            DAL<Investimentos> dalInv )
         {
-            return investimentos.Select(e=> RequestToEntity(e)).ToList();
+            var investimentosList = new List<Investimentos>();
+            var readInvestimentos = dalInv.Read();
+            foreach (var investimento in investimentos)
+            {
+                var investimentoEntity = RequestToEntity(investimento);
+                var investimentoInDb = readInvestimentos.FirstOrDefault(i => i.corretora == investimentoEntity.corretora);
+                if (investimentoInDb is not null)
+                {
+                    investimentosList.Add(investimentoInDb);
+                }
+                else
+                {
+                    investimentosList.Add(investimentoEntity);
+                }
+            }
+            
+            return investimentosList;
         }
 
         private static Investimentos RequestToEntity(InvestimentoRequest e)
