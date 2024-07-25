@@ -1,4 +1,6 @@
 ﻿using Finance_console;
+using FinanceManagement.Shared.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FinanceManagement.Shared.Data.DB
 {
-    public class FinanceContext : DbContext
+    public class FinanceContext : IdentityDbContext<AccessUser, AccessRoles, int>
     {
         public DbSet<Conta> Conta { get; set; }
         public DbSet<Transacao> Transacao { get; set; }
@@ -27,6 +29,7 @@ namespace FinanceManagement.Shared.Data.DB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Conta>().HasMany(inv => inv.investimentos).WithMany(conta => conta.contas);
         }
     }

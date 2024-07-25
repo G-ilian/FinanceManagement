@@ -10,13 +10,15 @@ namespace Finance.Endpoints
     {
         public static void AddEndpointsConta(this WebApplication app)
         {
-            app.MapGet("/Contas", ([FromServices] DAL<Conta> dal) =>
+            var groupBuilder = app.MapGroup("Contas").RequireAuthorization().WithTags("Contas");
+
+            groupBuilder.MapGet("", ([FromServices] DAL<Conta> dal) =>
             {
 
                 return Results.Ok(EntityListToResponse(dal.Read()));
             });
 
-            app.MapGet("/Contas/{id}", ([FromServices] DAL<Conta> dal,int id) =>
+            groupBuilder.MapGet("/{id}", ([FromServices] DAL<Conta> dal,int id) =>
             {
                 var hero = dal.ReadBy(dal => dal.id == id);
                 if (hero is null)
@@ -24,7 +26,7 @@ namespace Finance.Endpoints
                 return Results.Ok(EntityToResponse(hero));
             });
 
-            app.MapPost("/Contas", ([FromServices] DAL<Conta> dal,
+            groupBuilder.MapPost("", ([FromServices] DAL<Conta> dal,
                 [FromServices] DAL<Investimentos> dalInv,
                 [FromBody] ContaRequest contaRequest) =>
             {   
@@ -43,7 +45,7 @@ namespace Finance.Endpoints
                 return Results.Ok();
             });
 
-            app.MapPut("/Contas", ([FromServices] DAL<Conta> dal,
+            groupBuilder.MapPut("", ([FromServices] DAL<Conta> dal,
                 [FromBody] ContaEditRequest contaEditRequest) =>
             {
                 var contaToEdit = dal.ReadBy(c => c.id == contaEditRequest.id);
@@ -61,7 +63,7 @@ namespace Finance.Endpoints
                 return Results.Ok();
             });
 
-            app.MapDelete("/Contas/{id}", ([FromServices] DAL<Conta> dal,
+            groupBuilder.MapDelete("/{id}", ([FromServices] DAL<Conta> dal,
                 int id) =>
             {
                 var conta = dal.ReadBy(dal => dal.id == id);

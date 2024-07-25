@@ -10,12 +10,13 @@ namespace Finance.Endpoints
     {
         public static void AddEndpointsInvestimento(this WebApplication app)
         {
-            app.MapGet("/Investimentos", ([FromServices] DAL<Investimentos> dal) =>
+            var groupBuilder = app.MapGroup("Investimentos").RequireAuthorization().WithTags("Investimentos");
+            groupBuilder.MapGet("", ([FromServices] DAL<Investimentos> dal) =>
             {
                 return Results.Ok(EntityListToResponse(dal.Read()));
             });
 
-            app.MapPost("/Investimentos", ([FromServices] DAL<Investimentos> dal,
+            groupBuilder.MapPost("", ([FromServices] DAL<Investimentos> dal,
                 [FromBody] InvestimentoRequest investimentoRequest) =>
             {
                 var investimento = new Investimentos(investimentoRequest.descricao, investimentoRequest.valorInvestido,
@@ -26,7 +27,7 @@ namespace Finance.Endpoints
                 return Results.Ok();
             });
 
-            app.MapPut("/Investimentos", ([FromServices] DAL<Investimentos> dal,
+            groupBuilder.MapPut("", ([FromServices] DAL<Investimentos> dal,
                 [FromBody] InvestimentoEditRequest investimentoEditRequest) =>
             {
                 var investimentoToEdit = dal.ReadBy(c => c.id == investimentoEditRequest.id);
@@ -46,7 +47,7 @@ namespace Finance.Endpoints
                 return Results.Ok();
             });
 
-            app.MapDelete("/Investimentos/{id}", ([FromServices] DAL<Investimentos> dal,
+            groupBuilder.MapDelete("/{id}", ([FromServices] DAL<Investimentos> dal,
                 int id) =>
             {
                 var investimentoToDelete = dal.ReadBy(c => c.id == id);

@@ -10,8 +10,9 @@ namespace Finance.Endpoints
     {
         public static void AddEndpointsTransacao(this WebApplication app)
         {
+            var groupBuilder = app.MapGroup("Transacao").RequireAuthorization().WithTags("Transacao");
 
-            app.MapGet("/Transacao", ([FromServices] DAL<Transacao> dal) =>
+            groupBuilder.MapGet("", ([FromServices] DAL<Transacao> dal) =>
             {
                 var transacaoList = dal.Read();
                 if (transacaoList is null)
@@ -20,7 +21,7 @@ namespace Finance.Endpoints
                 return Results.Ok(EntityListToResponse(transacaoList));
             });
 
-            app.MapPost("/Transacao", ([FromServices] DAL<Transacao> dal
+            groupBuilder.MapPost("", ([FromServices] DAL<Transacao> dal
                 , [FromBody] TransacaoRequest transacaoRequest) => {
                     var transacao = new Transacao(transacaoRequest.valor, transacaoRequest.dataTransacao, 
                          transacaoRequest.descricao, transacaoRequest.tipo);
@@ -28,7 +29,7 @@ namespace Finance.Endpoints
                     return Results.Ok();
                 });
 
-            app.MapPut("/Transacao", ([FromServices] DAL<Transacao> dal, 
+            groupBuilder.MapPut("", ([FromServices] DAL<Transacao> dal, 
                 [FromBody] TransacaoEditRequest transacaoEditRequest) => {
                 var transacaoToEdit = dal.ReadBy(t => t.id == transacaoEditRequest.id);
 
@@ -44,7 +45,7 @@ namespace Finance.Endpoints
                 return Results.Ok();
             });
 
-            app.MapDelete("/Transacao/{id}", ([
+            groupBuilder.MapDelete("/{id}", ([
                 FromServices] DAL<Transacao> dal, int id) =>
             {
                 var transacao = dal.ReadBy(dal => dal.id == id);
