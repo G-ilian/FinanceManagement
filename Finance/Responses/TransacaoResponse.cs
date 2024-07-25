@@ -5,6 +5,8 @@
         DateTime dataTransacao,
         string descricao,
         string tipo,
-        int id
+        int id,
+        int contaId,
+        string contaNome
     );
 }

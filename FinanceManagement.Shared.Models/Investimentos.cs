@@ -17,9 +17,14 @@ namespace Finance_console
         public string riscoInvestimento { get; set; }
         public double rentabilidade { get; set; }
 
-        public Investimentos(int id, string descricao, double valorInvestido, string tipoInvestimento, string corretora, string riscoInvestimento, double rentabilidade)
+        public virtual ICollection<Conta> contas { get; set; }
+
+        public Investimentos()
         {
-            this.id = id;
+
+        }
+        public Investimentos(string descricao, double valorInvestido, string tipoInvestimento, string corretora, string riscoInvestimento, double rentabilidade)
+        {
             this.descricao = descricao;
             this.valorInvestido = valorInvestido;
             this.tipoInvestimento = tipoInvestimento;

@@ -13,7 +13,11 @@ namespace Finance.Endpoints
 
             app.MapGet("/Transacao", ([FromServices] DAL<Transacao> dal) =>
             {
-                return Results.Ok(EntityListToResponse(dal.Read()));
+                var transacaoList = dal.Read();
+                if (transacaoList is null)
+                    return Results.NotFound();
+
+                return Results.Ok(EntityListToResponse(transacaoList));
             });
 
             app.MapPost("/Transacao", ([FromServices] DAL<Transacao> dal
@@ -59,7 +63,14 @@ namespace Finance.Endpoints
 
         private static TransacaoResponse EntityToResponse(Transacao transacao)
         {
-            return new TransacaoResponse(transacao.valor, transacao.dataTransacao, transacao.descricao, transacao.tipo, transacao.id);
+            return new TransacaoResponse(
+                transacao.valor, 
+                transacao.dataTransacao, 
+                transacao.descricao ?? String.Empty, 
+                transacao.tipo ?? String.Empty, 
+                transacao.id,
+                transacao.conta?.id ?? 00,
+                transacao.conta?.nome ??"No linked account!");
         }
     }
 }

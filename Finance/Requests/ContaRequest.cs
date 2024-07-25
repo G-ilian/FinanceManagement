@@ -4,6 +4,7 @@
         string nome,
         double saldo,
         string tipo,
-        string instituicao
+        string instituicao,
+        ICollection<InvestimentoRequest> investimentos = null
         );
 }

@@ -26,9 +26,17 @@ namespace Finance.Endpoints
 
             app.MapPost("/Contas", ([FromServices] DAL<Conta> dal,
                 [FromBody] ContaRequest contaRequest) =>
-            {
+            {   
                 var conta = new Conta(contaRequest.nome, contaRequest.tipo, 
-                    contaRequest.saldo, contaRequest.instituicao);
+                    contaRequest.saldo, contaRequest.instituicao){
+
+                            investimentos = 
+                            contaRequest.investimentos is not null ?
+                            investimentoRequestConverter(contaRequest.investimentos) : 
+                            new List<Investimentos>()
+                    
+                    };
+
 
                 dal.Create(conta);
                 return Results.Ok();
@@ -63,6 +71,21 @@ namespace Finance.Endpoints
                 dal.Delete(conta);
                 return Results.Ok();
             });
+        }
+
+        private static ICollection<Investimentos> investimentoRequestConverter(ICollection<InvestimentoRequest> investimentos)
+        {
+            return investimentos.Select(e=> RequestToEntity(e)).ToList();
+        }
+
+        private static Investimentos RequestToEntity(InvestimentoRequest e)
+        {
+            return new Investimentos(e.descricao, e.
+                valorInvestido, 
+                e.tipoInvestimento,
+                e.corretora, 
+                e.riscoInvestimento, 
+                e.rentabilidade);
         }
 
         private static ICollection<ContaResponse> EntityListToResponse(IEnumerable<Conta> contaList)
