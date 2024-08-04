@@ -16,6 +16,22 @@ namespace Finance.Endpoints
                 return Results.Ok(EntityListToResponse(dal.Read()));
             });
 
+            groupBuilder.MapGet("{id}/contas", (
+                [FromServices] DAL<Investimentos> dalInv,
+                [FromServices] DAL<Conta> dalConta,
+                int id) =>
+            {
+                var investimento = dalInv.ReadBy(c => c.id == id);
+                if (investimento is null)
+                    return Results.NotFound();
+
+                var contas = dalConta.Read().Where(conta => conta.investimentos.Any(inv => inv.id == id)).ToList();
+
+                var contasResponse = contas.Select(c => new ContaResponse(c.nome, c.tipo, c.saldo, c.instituicao, c.id)).ToList();
+          
+                return Results.Ok(contasResponse);
+            });
+
             groupBuilder.MapPost("", ([FromServices] DAL<Investimentos> dal,
                 [FromBody] InvestimentoRequest investimentoRequest) =>
             {
