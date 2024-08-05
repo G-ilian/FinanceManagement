@@ -18,6 +18,8 @@ namespace FinanceManagement.Shared.Data.DB
 
         public DbSet<Investimentos> Investimentos { get; set; }
 
+        public DbSet<Usuario> Usuario { get; set; }
+
         private string _connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=FinanceDB_V0;" +
             "Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;" +
             "Multi Subnet Failover=False";
@@ -29,7 +31,12 @@ namespace FinanceManagement.Shared.Data.DB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+        
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Usuario>()
+                    .HasMany(u => u.contas)
+                    .WithOne(c => c.usuario)
+                    .HasForeignKey("usuarioid");
             modelBuilder.Entity<Conta>().HasMany(inv => inv.investimentos).WithMany(conta => conta.contas);
         }
     }

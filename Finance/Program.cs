@@ -16,6 +16,7 @@ builder.Services.AddDbContext<FinanceContext>();
 builder.Services.AddTransient<DAL<Conta>>();
 builder.Services.AddTransient<DAL<Transacao>>();
 builder.Services.AddTransient<DAL<Investimentos>>();
+builder.Services.AddTransient<DAL<Usuario>>();
 
 // Identity
 builder.Services
@@ -37,6 +38,7 @@ app.UseAuthorization();
 app.AddEndpointsConta();
 app.AddEndpointsTransacao();
 app.AddEndpointsInvestimento();
+app.AddEnpointsUsuario();
 
 // Identity - Endpoints
 app.MapGroup("auth").MapIdentityApi<AccessUser>().WithTags("Authorization");
